@@ -1,0 +1,20 @@
+<body>
+  <div class="main-container">
+    <div class="user-list">
+      <div class="header">
+        <img height="40" src="../../../assets/chatapp.png" alt="chat image" />
+        <h1>Chat App </h1>
+      </div>
+      <div *ngFor="let user of users" class="user-card" (click)="showMessage(user.id)">
+        <div class="username">
+          <div class="img">
+            <span style="font-weight: 600;">{{ user.name.charAt(0) | lowercase }}</span>
+          </div>
+          <p style="font-weight: 600;"> {{ user.name }} </p>
+        </div>
+        <p style="margin-left: 50px;"> {{ user.email }} </p>
+      </div>
+    </div>
+    <router-outlet name="childPopup"></router-outlet>
+  </div>
+</body>
