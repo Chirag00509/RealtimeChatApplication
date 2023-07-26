@@ -15,6 +15,9 @@
         <span *ngIf="getControl('password')?.errors && getControl('password')?.touched" style="color: red;">Password is
           required.</span>
       </div>
+      <div style="display: flex; justify-content: center; margin: 20px 0;">
+        <asl-google-signin-button theme="filled_blue" type="standard" shape='pill' size='medium'></asl-google-signin-button>
+      </div>
       <a href="#" class="link">Forgot Your Password?</a>
     </div>
     <div class="action">

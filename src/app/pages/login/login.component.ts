@@ -1,3 +1,4 @@
+import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -11,12 +12,23 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class LoginComponent implements OnInit {
 
-  loginForm!: FormGroup
+  loginForm!: FormGroup;
+  user: SocialUser | null;
+  loggedIn: boolean = false;
 
-  constructor(private formBuilder: FormBuilder, private userService: UserService, private router: Router) { }
+  constructor(private formBuilder: FormBuilder,
+    private userService: UserService,
+    private router: Router,
+    private authService: SocialAuthService
+    ) { this.user = null }
 
   ngOnInit(): void {
     this.initializeForm();
+    this.authService.authState.subscribe((user) => {
+      this.user = user;
+      this.loggedIn = (user != null);
+      this.googleTokenVerifier(this.user.idToken);
+    });
   }
 
   initializeForm() {
@@ -28,6 +40,13 @@ export class LoginComponent implements OnInit {
 
   getControl(name: any): AbstractControl | null {
     return this.loginForm.get(name);
+  }
+
+  googleTokenVerifier(token: string) {
+    this.userService.VerifyToken(token).subscribe((res) => {
+      localStorage.setItem("authToken", res.token);
+      this.router.navigateByUrl("/chat");
+    })
   }
 
   navigatePage() {

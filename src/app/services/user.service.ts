@@ -98,4 +98,12 @@ export class UserService {
     return this.http.put<any>(`https://localhost:7223/api/Message/${id}`, body, { headers : headers } );
   }
 
+  VerifyToken(tokenId: string) :  Observable<any> {
+
+    const body = {
+      "TokenId" : tokenId
+    }
+    return this.http.post<any>("https://localhost:7223/api/SocialLogin", body)
+  }
+
 }
