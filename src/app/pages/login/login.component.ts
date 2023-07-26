@@ -13,7 +13,7 @@ export class LoginComponent implements OnInit {
 
   loginForm!: FormGroup
 
-  constructor(private formBuilder : FormBuilder, private userService : UserService, private router : Router ) {}
+  constructor(private formBuilder: FormBuilder, private userService: UserService, private router: Router) { }
 
   ngOnInit(): void {
     this.initializeForm();
@@ -21,12 +21,12 @@ export class LoginComponent implements OnInit {
 
   initializeForm() {
     this.loginForm = this.formBuilder.group({
-      email : new FormControl('', [ Validators.required, Validators.email ]),
-      password: new FormControl('', [ Validators.required, Validators.minLength(6) ])
+      email: new FormControl('', [Validators.required, Validators.email]),
+      password: new FormControl('', [Validators.required, Validators.minLength(6)])
     })
   }
 
-  getControl(name: any) : AbstractControl | null  {
+  getControl(name: any): AbstractControl | null {
     return this.loginForm.get(name);
   }
 
@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
 
   login(data: any) {
     this.userService.login(data).subscribe((res) => {
-      if(res) {
+      if (res) {
         localStorage.setItem("authToken", res.token);
         alert("You have successfully login");
         this.router.navigateByUrl("/chat");
@@ -46,6 +46,6 @@ export class LoginComponent implements OnInit {
         const errorMessage = error.error.message;
         alert(errorMessage);
       }
-    } )
+    })
   }
 }
