@@ -26,6 +26,7 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.authService.authState.subscribe((user) => {
+      console.log(user);
       this.user = user;
       this.loggedIn = (user != null);
       this.googleTokenVerifier(this.user.idToken);
