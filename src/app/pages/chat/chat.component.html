@@ -1,4 +1,10 @@
-<body>
+<body *ngIf="!searchResult">
+  <form [formGroup]="serchForm" (ngSubmit)="search(serchForm.value)">
+    <input type="search" formControlName="search">
+    <button>
+      <i class="fa fa-search" aria-hidden="true"></i>
+    </button>
+  </form>
   <div class="main-container">
     <div class="user-list">
       <div class="header">
@@ -18,3 +24,4 @@
     <router-outlet name="childPopup"></router-outlet>
   </div>
 </body>
+<router-outlet name="childPopup1"></router-outlet>

@@ -106,4 +106,19 @@ export class UserService {
     return this.http.post<any>("https://localhost:7223/api/SocialLogin", body)
   }
 
+  searchHistory(result : any) :  Observable<any> {
+    const token = localStorage.getItem('authToken');
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<any>(`https://localhost:7223/api/conversation/search/${result}`, { headers : headers } )
+  }
+
+  getName(id : string) : Observable<any> {
+    return this.http.get<any>(`https://localhost:7223/swagger/index.html#:~:text=Request%20URL-,https%3A//localhost%3A7223/api/User/${id}`)
+  }
+
 }

@@ -30,7 +30,7 @@ export class ConversationComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.currentId = +params['id'];
+      this.currentId = params['id'];
       this.showMessage(this.currentId);
       this.getUserList(this.currentId);
     });

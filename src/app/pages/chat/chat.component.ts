@@ -12,11 +12,24 @@ import { Router } from '@angular/router';
 export class ChatComponent implements OnInit {
 
   users: any[] = [];
+  serchForm!: FormGroup
+  searchResult = false;
 
   constructor(private userService: UserService, private formBuilder: FormBuilder, private router: Router) { }
 
   ngOnInit(): void {
     this.getUserList();
+    this.initializeForm();
+  }
+
+  initializeForm() {
+    this.serchForm = this.formBuilder.group({
+      search: new FormControl('', [Validators.required]),
+    })
+  }
+
+  getControl(name: any): AbstractControl | null {
+    return this.serchForm.get(name);
   }
 
   getUserList() {
@@ -37,5 +50,10 @@ export class ChatComponent implements OnInit {
 
   showMessage(id: any) {
     this.router.navigate(['/chat', { outlets: { childPopup: [ 'user', id ] }}]);
+  }
+
+  search(data: any) {
+    this.searchResult = true;
+    this.router.navigate(['/chat', { outlets: { childPopup1: [ 'search', data.search ] }}])
   }
 }

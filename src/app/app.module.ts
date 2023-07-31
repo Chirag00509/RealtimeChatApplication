@@ -13,6 +13,7 @@ import { SocialLoginModule, SocialAuthServiceConfig, GoogleSigninButtonModule } 
 import {
   GoogleLoginProvider
 } from '@abacritt/angularx-social-login';
+import { SearchResultComponent } from './pages/search-result/search-result.component';
 
 
 
@@ -24,6 +25,7 @@ import {
     ChatComponent,
     ConversationComponent,
     LoggingComponent,
+    SearchResultComponent,
   ],
   imports: [
     SocialLoginModule,
