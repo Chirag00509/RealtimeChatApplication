@@ -1,5 +1,13 @@
 export class MessageDto {
-  public reciverdId: string = '';
-  public content: string = '';
-  public connectionId : string = '';
+  senderId: string;
+  reciverdId: string;
+  content: string;
+  id: number;
+
+  constructor() {
+    this.senderId = '';
+    this.reciverdId = '';
+    this.content = '';
+    this.id = 0;
+  }
 }

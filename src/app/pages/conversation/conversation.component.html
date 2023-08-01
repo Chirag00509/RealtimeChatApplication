@@ -7,7 +7,7 @@
   </div>
   <div class="background">
     <div class="text">
-      <span *ngFor="let message of allMessages" class="text1">
+      <span *ngFor="let message of msgInboxArray" class="text1">
         <div class="incoming message" *ngIf="message.senderId == currentId" (click)="showDropdown(message.id)">
           <h4>{{users}}</h4>
           <p>{{message.content}}</p>

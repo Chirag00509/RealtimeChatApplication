@@ -40,7 +40,9 @@ export class ConversationComponent implements OnInit {
       this.showMessage(this.currentId);
       this.getUserList(this.currentId);
     });
-    this.chatService.retrieveMappedObject().subscribe((receivedObj: MessageDto) => { this.addToInbox(receivedObj); });
+    this.chatService.retrieveMappedObject().subscribe((receivedObj: MessageDto) => {
+      this.addToInbox(receivedObj);
+    });
     this.initializeForm();
   }
 
@@ -89,10 +91,15 @@ export class ConversationComponent implements OnInit {
   }
 
   showMessage(id: number) {
+    console.log(this.msgInboxArray);
     this.userService.getMessage(id).subscribe((res) => {
-      this.allMessages = [];
-      this.allMessages = res;
-
+      this.msgInboxArray = [];
+      for (const message of res) {
+        this.addToInbox(message);
+      }
+      this.allMessages = this.msgInboxArray.filter(
+        (message) => message.senderId === this.userId || message.reciverdId === this.userId
+      );
     }, (error) => {
       if (error instanceof HttpErrorResponse) {
         const errorMessage = error.error.message;
@@ -110,20 +117,38 @@ export class ConversationComponent implements OnInit {
     })
   }
 
-  addToInbox(obj: MessageDto) {
-    let newObj = new MessageDto();
-    newObj.reciverdId = obj.reciverdId;
-    newObj.content = obj.content;
-    this.msgInboxArray.push(newObj);
-  }
+  // addToInbox(obj: MessageDto) {
+  //   let newObj = new MessageDto();
+  //   newObj.reciverdId = obj.reciverdId;
+  //   newObj.content = obj.content;
+  //   this.msgInboxArray.push(newObj);
+  // }
 
+  addToInbox(obj: MessageDto) {
+    const messageExists = this.msgInboxArray.some((message) => message.id === obj.id);
+    if (!messageExists) {
+      this.msgInboxArray.push(obj);
+
+      // Filter the messages for the current user
+      this.allMessages = this.msgInboxArray.filter(
+        (message) => message.senderId === this.userId || message.reciverdId === this.userId
+      );
+    }
+
+  }
   cancelEdit(event: any) {
     event.preventDefault();
     this.messageEdit = false
   }
 
   sendMessages(data: any) {
-    this.userService.sendMesage(data, this.currentId).subscribe((res) => {
+    this.userService.sendMesage(data, this.currentId).subscribe(async (res) => {
+      this.msgDto.content = res.content
+      this.msgDto.reciverdId = res.receiverId;
+      this.msgDto.senderId = res.senderId;
+      this.msgDto.id = res.messageId;
+      await this.chatService.broadcastMessage(this.msgDto);
+      console.log(this.msgDto);
       this.showMessage(res.receiverId);
       this.showMessageInput = ""
     }, (error) => {
