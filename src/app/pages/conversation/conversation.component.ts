@@ -117,13 +117,6 @@ export class ConversationComponent implements OnInit {
     })
   }
 
-  // addToInbox(obj: MessageDto) {
-  //   let newObj = new MessageDto();
-  //   newObj.reciverdId = obj.reciverdId;
-  //   newObj.content = obj.content;
-  //   this.msgInboxArray.push(newObj);
-  // }
-
   addToInbox(obj: MessageDto) {
     const messageExists = this.msgInboxArray.some((message) => message.id === obj.id);
     if (!messageExists) {
