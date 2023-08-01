@@ -7,7 +7,7 @@
   </div>
   <div class="background">
     <div class="text">
-      <span *ngFor="let message of allMessages" class="text1">
+      <span *ngFor="let message of msgInboxArray" class="text1">
         <div class="incoming message" *ngIf="message.senderId == currentId" (click)="showDropdown(message.id)">
           <h4>{{users}}</h4>
           <p>{{message.content}}</p>
@@ -33,9 +33,9 @@
     </div>
     <form [formGroup]="sendMessageForm" (ngSubmit)="sendMessages(sendMessageForm.value)">
       <div style="display: flex; justify-content: center;">
-        <input type="text" id="textarea" style="margin-bottom: 25px;" [(ngModel)]="showMessageInput" placeholder="Write a message..." class="message1"
+        <input type="text" id="textarea" style="margin-bottom: 12px;" [(ngModel)]="showMessageInput" placeholder="Write a message..." class="message1"
           formControlName="message" autofocus />
-        <button class="btn" [disabled]="sendMessageForm.invalid" style="margin-bottom: 25px;">Send</button>
+        <button class="btn" [disabled]="sendMessageForm.invalid" style="margin-bottom: 12px;">Send</button>
       </div>
     </form>
   </div>
