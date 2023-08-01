@@ -118,7 +118,7 @@ export class UserService {
   }
 
   getName(id : string) : Observable<any> {
-    return this.http.get<any>(`https://localhost:7223/swagger/index.html#:~:text=Request%20URL-,https%3A//localhost%3A7223/api/User/${id}`)
+    return this.http.get<any>(`https://localhost:7223/api/User/${id}`)
   }
 
 }

@@ -1,10 +1,10 @@
 <body *ngIf="!searchResult">
-  <form [formGroup]="serchForm" (ngSubmit)="search(serchForm.value)">
+  <!-- <form [formGroup]="serchForm" (ngSubmit)="search(serchForm.value)">
     <input type="search" formControlName="search">
     <button>
       <i class="fa fa-search" aria-hidden="true"></i>
     </button>
-  </form>
+  </form> -->
   <div class="main-container">
     <div class="user-list">
       <div class="header">
@@ -14,7 +14,7 @@
       <div *ngFor="let user of users" class="user-card" (click)="showMessage(user.id)">
         <div class="username">
           <div class="img">
-            <span style="font-weight: 600;">{{ user.name.charAt(0) | lowercase }}</span>
+            <span style="font-weight: 600;">{{ user.name.charAt(0) | uppercase }}</span>
           </div>
           <p style="font-weight: 600;"> {{ user.name }} </p>
         </div>

@@ -52,7 +52,11 @@ export class ConversationComponent implements OnInit {
     })
   }
 
-  getUserList(id: number) {
+  getControl(name: any): AbstractControl | null {
+    return this.sendMessageForm.get(name);
+  }
+
+  getUserList(id: string) {
 
     const jwtToken = localStorage.getItem('authToken');
 
@@ -62,18 +66,11 @@ export class ConversationComponent implements OnInit {
     }
     const decodedToken: any = jwt_decode(jwtToken);
 
-    const Id = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
-    const name = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
+    this.userId = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+    this.userName = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
 
-    this.userId = Id;
-    this.userName = name;
-
-    this.userService.userList().subscribe((res) => {
-
-      const user = res.find(user => user.id === id);
-      this.users = user.name;
-      this.sortName = this.users.charAt(0);
-
+    this.userService.getName(id).subscribe((res) => {
+      this.users = res.name
     }, (error) => {
       if (error instanceof HttpErrorResponse) {
         const errorMessage = error.error.message;
@@ -86,9 +83,6 @@ export class ConversationComponent implements OnInit {
     })
   }
 
-  getControl(name: any): AbstractControl | null {
-    return this.sendMessageForm.get(name);
-  }
 
   showMessage(id: number) {
     console.log(this.msgInboxArray);
@@ -111,8 +105,12 @@ export class ConversationComponent implements OnInit {
   saveMessage(event: any, id: any) {
     event.preventDefault();
     this.userService.editMessage(id, this.displyMessage).subscribe((res) => {
+      const editDto = {
+        content: this.displyMessage,
+        id: id,
+      };
+      this.chatService.broadcastMessage(editDto);
       alert(res.message);
-      this.showMessage(this.currentId);
       this.messageEdit = false
     })
   }
@@ -121,8 +119,6 @@ export class ConversationComponent implements OnInit {
     const messageExists = this.msgInboxArray.some((message) => message.id === obj.id);
     if (!messageExists) {
       this.msgInboxArray.push(obj);
-
-      // Filter the messages for the current user
       this.allMessages = this.msgInboxArray.filter(
         (message) => message.senderId === this.userId || message.reciverdId === this.userId
       );
@@ -136,14 +132,17 @@ export class ConversationComponent implements OnInit {
 
   sendMessages(data: any) {
     this.userService.sendMesage(data, this.currentId).subscribe(async (res) => {
-      this.msgDto.content = res.content
-      this.msgDto.reciverdId = res.receiverId;
-      this.msgDto.senderId = res.senderId;
-      this.msgDto.id = res.messageId;
-      await this.chatService.broadcastMessage(this.msgDto);
-      console.log(this.msgDto);
-      this.showMessage(res.receiverId);
+
+      this.msgDto = {
+        content: res.content,
+        reciverdId: res.receiverId,
+        id: res.messageId,
+        senderId: res.senderId
+      }
+
+      this.chatService.broadcastMessage(this.msgDto);
       this.showMessageInput = ""
+
     }, (error) => {
       if (error instanceof HttpErrorResponse) {
         const errorMessage = error.error.message;

@@ -12,16 +12,15 @@ export class ChatService {
     .configureLogging(signalR.LogLevel.Information)
     .build();
 
-  readonly POST_URL = "https://localhost:7223/api/Message";
-
-  private receivedMessageObject: MessageDto = new MessageDto();
   private sharedObj = new Subject<MessageDto>();
+  private messages: MessageDto[] = [];
 
   constructor(private http: HttpClient) {
     this.connection.onclose(async () => {
       await this.start();
     });
-    this.connection.on("ReceiveOne", (user: any, message: any) => { this.mapReceivedMessage( user, message ); });
+    this.connection.on("ReceiveOne", (message: any) => { this.mapReceivedMessage( message ); });
+    this.connection.on("ReceiveEdited", (message: any) => { this.mapReceivedEditedMessage(message); });
     this.start();
   }
 
@@ -29,29 +28,41 @@ export class ChatService {
     try {
       await this.connection.start();
       console.log("connected");
-      // this.receivedMessageObject.connectionId = this.connection.connectionId
     } catch (err) {
       console.log(err);
       setTimeout(() => this.start(), 5000);
     }
   }
 
-  private mapReceivedMessage(user:string ,message:any): void {
+  private mapReceivedMessage(message:any): void {
     const receivedMessageObject: MessageDto = new MessageDto();
+
     receivedMessageObject.id = message.id;
-    receivedMessageObject.senderId = user;
+    receivedMessageObject.senderId = message.senderId;
     receivedMessageObject.reciverdId = message.receiverId;
     receivedMessageObject.content = message.content;
+
+    this.messages.push(receivedMessageObject);
     this.sharedObj.next(receivedMessageObject);
+
+  }
+
+  private mapReceivedEditedMessage(messsage: any) : void {
+    const editedMessageIndex = this.messages.findIndex(msg => msg.id === messsage.id);
+    console.log(editedMessageIndex);
   }
 
   public broadcastMessage(msgDto: any) {
-    debugger;
     this.connection.invoke("SendMessage", msgDto).catch((err: any) => console.error(err));
   }
 
-  public retrieveMappedObject(): Observable<MessageDto> {
+  public broadcastEditedMessage(msgDto: any) {
     debugger;
+    this.connection.invoke("SendEditedMessage", msgDto).catch((err: any) => console.error(err));
+  }
+
+
+  public retrieveMappedObject(): Observable<MessageDto> {
     return this.sharedObj.asObservable();
   }
 }
