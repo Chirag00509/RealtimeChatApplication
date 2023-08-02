@@ -1,0 +1,6 @@
+<div class="message-container">
+  <div *ngFor="let message of messages" class="message">
+    <h4>{{ senderNames[message.senderId] }}</h4>
+    <p>{{ message.content }}</p>
+  </div>
+</div>

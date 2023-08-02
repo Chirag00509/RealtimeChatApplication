@@ -34,7 +34,7 @@ body {
 .user-list {
   overflow: auto;
   width: 20vw;
-  height: 100vh;
+  height: 93vh;
   background-color: #f1f1f1;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -81,4 +81,24 @@ body {
 .username {
   display: flex;
   align-items: center;
+}
+
+.form {
+  width: 100vw;
+  height: 7vh;
+  padding: 15px;
+  font-size: 20px;
+  text-align: center;
+  position: relative;
+}
+
+.searchBtn {
+  border: none;
+  background: transparent;
+  position: absolute;
+  right: 0;
+  top: 10px;
+  margin-right: 10px;
+  font-size: 17px;
+  font-weight: 600;
 }

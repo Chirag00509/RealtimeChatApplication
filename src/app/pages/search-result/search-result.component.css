@@ -1,0 +1,19 @@
+.message-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message {
+  background-color: #f2f2f2;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+  align-self: flex-start;
+}
+
+.own-message {
+  background-color: #3f87a6;
+  color: #fff;
+  align-self: flex-end;
+}

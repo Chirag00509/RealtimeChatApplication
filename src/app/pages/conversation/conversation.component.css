@@ -10,7 +10,7 @@
 .container {
   background: #fff;
   width: 80vw;
-  height: 100vh;
+  height: 93vh;
 }
 
 /* .background{
@@ -54,7 +54,7 @@ input {
 .text {
   overflow-y: auto;
   padding-top: 35px;
-  height: 492px;
+  height: 450px;
   color: #A6ACAF;
 }
 

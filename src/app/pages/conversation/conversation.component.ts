@@ -152,7 +152,7 @@ export class ConversationComponent implements OnInit {
   deleteMessage(id: any) {
     const isConfirmed = confirm("Are you sure you want to delete this message?");
     if (isConfirmed) {
-    this.getMessages(this.msgInboxArray);
+      this.getMessages(this.msgInboxArray);
       this.userService.deleteMessage(id).subscribe((res) => {
         const editDto = {
           id: id,

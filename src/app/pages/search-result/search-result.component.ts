@@ -9,7 +9,11 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class SearchResultComponent implements OnInit {
 
-  constructor(private userService : UserService, private route : ActivatedRoute) {}
+  senderNames: { [key: string]: string } = {};
+  messages : any;
+
+
+  constructor(private userService: UserService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.getHistory();
@@ -20,15 +24,12 @@ export class SearchResultComponent implements OnInit {
     console.log(history);
 
     this.userService.searchHistory(history).subscribe((res) => {
-      console.log(res);
+      this.messages = res
+      res.forEach((message: any) => {
+        this.userService.getName(message.senderId).subscribe((senderRes) => {
+          this.senderNames[message.senderId] = senderRes.name;
+        });
+      })
     })
   }
-
-  getUserName(id : string) {
-    this.userService.getName(id).subscribe((res) => {
-      console.log(res);
-    })
-  }
-
-
 }

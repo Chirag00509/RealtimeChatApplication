@@ -8,7 +8,8 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class ChatService {
-  private connection: any = new signalR.HubConnectionBuilder().withUrl("https://localhost:7223/chat")
+  token = localStorage.getItem("authToken");
+  private connection: any = new signalR.HubConnectionBuilder().withUrl(`https://localhost:7223/chat?token=${this.token}`)
     .configureLogging(signalR.LogLevel.Information)
     .build();
 
@@ -30,6 +31,8 @@ export class ChatService {
     try {
       await this.connection.start();
       console.log("connected");
+      const connectionId = this.connection.connectionId;
+      console.log("Connection ID:", connectionId);
     } catch (err) {
       console.log(err);
       setTimeout(() => this.start(), 5000);
