@@ -34,7 +34,6 @@ export class ConversationComponent implements OnInit {
   constructor(private userService: UserService, private formBuilder: FormBuilder, private router: Router, private route: ActivatedRoute, private chatService: ChatService) { }
 
   ngOnInit(): void {
-    this.length = this.msgInboxArray.length
     this.route.params.subscribe(params => {
       this.currentId = params['id'];
       this.showMessage(this.currentId);
@@ -85,7 +84,6 @@ export class ConversationComponent implements OnInit {
 
 
   showMessage(id: number) {
-    console.log(this.msgInboxArray);
     this.userService.getMessage(id).subscribe((res) => {
       this.msgInboxArray = [];
       for (const message of res) {
@@ -109,7 +107,7 @@ export class ConversationComponent implements OnInit {
         content: this.displyMessage,
         id: id,
       };
-      this.chatService.broadcastMessage(editDto);
+      this.chatService.broadcastEditedMessage(editDto);
       alert(res.message);
       this.messageEdit = false
     })
@@ -151,11 +149,15 @@ export class ConversationComponent implements OnInit {
     })
   }
 
-  deleteMessage(id: number) {
+  deleteMessage(id: any) {
     const isConfirmed = confirm("Are you sure you want to delete this message?");
     if (isConfirmed) {
+    this.getMessages(this.msgInboxArray);
       this.userService.deleteMessage(id).subscribe((res) => {
-        this.showMessage(this.currentId);
+        const editDto = {
+          id: id,
+        };
+        this.chatService.broadcastDeletedMessage(editDto);
         alert(res.message);
       }, (error) => {
         if (error instanceof HttpErrorResponse) {
@@ -170,10 +172,15 @@ export class ConversationComponent implements OnInit {
     this.displyMessage = message.content;
     this.editMessageId = message.id;
     this.messageEdit = true;
+    this.getMessages(this.msgInboxArray);
   }
 
   showDropdown(messageId: any) {
     this.isDropdownOpen = !this.isDropdownOpen;
     this.selectedMessageId = this.selectedMessageId === messageId ? null : messageId;
+  }
+
+  getMessages(message: any) {
+    this.chatService.updateMessage(message);
   }
 }

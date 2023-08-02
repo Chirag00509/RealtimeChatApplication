@@ -1,8 +1,8 @@
 export class MessageDto {
+  id: number;
   senderId: string;
   reciverdId: string;
   content: string;
-  id: number;
 
   constructor() {
     this.senderId = '';

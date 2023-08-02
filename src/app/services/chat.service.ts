@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { HttpClient } from '@angular/common/http';
 import { MessageDto } from '../Dto/MessageDto';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,15 +12,17 @@ export class ChatService {
     .configureLogging(signalR.LogLevel.Information)
     .build();
 
-  private sharedObj = new Subject<MessageDto>();
-  private messages: MessageDto[] = [];
+  private msgInboxArray: MessageDto[] = [];
+  private sharedObj = new Subject<MessageDto>();;
 
   constructor(private http: HttpClient) {
     this.connection.onclose(async () => {
       await this.start();
     });
     this.connection.on("ReceiveOne", (message: any) => { this.mapReceivedMessage( message ); });
-    this.connection.on("ReceiveEdited", (message: any) => { this.mapReceivedEditedMessage(message); });
+    this.connection.on("ReceiveEdited", (message: any) => { this.mapReceivedEditedMessage( message ); });
+    this.connection.on("ReceiveDeleted", (message: any) => { this.mapReceivedDeletedMessage( message ); });
+
     this.start();
   }
 
@@ -35,21 +37,33 @@ export class ChatService {
   }
 
   private mapReceivedMessage(message:any): void {
-    const receivedMessageObject: MessageDto = new MessageDto();
+    debugger;
+    const receivedMessageObject: MessageDto = {
+      id: message.id,
+      senderId: message.senderId,
+      reciverdId: message.receiverId,
+      content: message.content
+    };
 
-    receivedMessageObject.id = message.id;
-    receivedMessageObject.senderId = message.senderId;
-    receivedMessageObject.reciverdId = message.receiverId;
-    receivedMessageObject.content = message.content;
-
-    this.messages.push(receivedMessageObject);
     this.sharedObj.next(receivedMessageObject);
-
   }
 
-  private mapReceivedEditedMessage(messsage: any) : void {
-    const editedMessageIndex = this.messages.findIndex(msg => msg.id === messsage.id);
-    console.log(editedMessageIndex);
+  public updateMessage(allMessage: any) {
+    this.msgInboxArray = allMessage;
+  }
+
+  private mapReceivedEditedMessage(message: any) : void {
+    const editedMessageIndex = this.msgInboxArray.findIndex(msg => msg.id == message.id);
+    if (editedMessageIndex !== -1) {
+      this.msgInboxArray[editedMessageIndex].content = message.content;
+    }
+  }
+
+  private mapReceivedDeletedMessage(message : any) : void {
+    const editedMessageIndex = this.msgInboxArray.findIndex(msg => msg.id == message.id);
+    if (editedMessageIndex !== -1) {
+      this.msgInboxArray.splice(editedMessageIndex, 1);
+    }
   }
 
   public broadcastMessage(msgDto: any) {
@@ -57,10 +71,13 @@ export class ChatService {
   }
 
   public broadcastEditedMessage(msgDto: any) {
-    debugger;
     this.connection.invoke("SendEditedMessage", msgDto).catch((err: any) => console.error(err));
   }
 
+  public broadcastDeletedMessage(msgDto: any) {
+    debugger;
+    this.connection.invoke("SendDeletedMessage", msgDto).catch((err: any) => console.error(err));
+  }
 
   public retrieveMappedObject(): Observable<MessageDto> {
     return this.sharedObj.asObservable();
