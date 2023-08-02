@@ -81,8 +81,6 @@ export class UserService {
   }
 
   editMessage(id: number, message: string) :  Observable<any> {
-    console.log(id);
-    console.log(message);
 
     const body = {
       "content" : message
