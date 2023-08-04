@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,7 +12,12 @@ import { ChatService } from '../../services/chat.service';
   templateUrl: './conversation.component.html',
   styleUrls: ['./conversation.component.css']
 })
-export class ConversationComponent implements OnInit {
+export class ConversationComponent implements OnInit, AfterViewInit, AfterViewChecked {
+  @ViewChild('chatContainer') private chatContainerRef!: ElementRef;
+
+  private shouldScrollToBottom: boolean = false;
+  private isLoadingMessages: boolean = false;
+  private allMessagesLoaded: boolean = false;
 
   users: any;
   sortName: any
@@ -30,6 +35,7 @@ export class ConversationComponent implements OnInit {
   msgDto: MessageDto = new MessageDto();
   msgInboxArray: MessageDto[] = [];
   length: number = 0;
+  count : number = 20;
 
   constructor(private userService: UserService, private formBuilder: FormBuilder, private router: Router, private route: ActivatedRoute, private chatService: ChatService) { }
 
@@ -41,8 +47,23 @@ export class ConversationComponent implements OnInit {
     });
     this.chatService.retrieveMappedObject().subscribe((receivedObj: MessageDto) => {
       this.addToInbox(receivedObj);
+      if (this.shouldScrollToBottom) {
+        this.scrollToBottom();
+        this.shouldScrollToBottom = true;
+      }
     });
     this.initializeForm();
+  }
+
+  ngAfterViewInit() {
+    this.scrollToBottom();
+  }
+
+  ngAfterViewChecked() {
+    if (this.shouldScrollToBottom) {
+      this.scrollToBottom();
+      this.shouldScrollToBottom = false;
+    }
   }
 
   initializeForm() {
@@ -82,9 +103,9 @@ export class ConversationComponent implements OnInit {
     })
   }
 
-
   showMessage(id: number) {
-    this.userService.getMessage(id).subscribe((res) => {
+    this.userService.getMessage(id, this.count).subscribe((res) => {
+    this.shouldScrollToBottom = true;
       this.msgInboxArray = [];
       for (const message of res) {
         this.addToInbox(message);
@@ -129,15 +150,14 @@ export class ConversationComponent implements OnInit {
   }
 
   sendMessages(data: any) {
+    this.shouldScrollToBottom = true;
     this.userService.sendMesage(data, this.currentId).subscribe(async (res) => {
-
       this.msgDto = {
         content: res.content,
         reciverdId: res.receiverId,
         id: res.messageId,
         senderId: res.senderId
       }
-
       this.chatService.broadcastMessage(this.msgDto);
       this.showMessageInput = ""
 
@@ -183,4 +203,42 @@ export class ConversationComponent implements OnInit {
   getMessages(message: any) {
     this.chatService.updateMessage(message);
   }
+
+  onChatScroll() {
+    const scrollTop = this.chatContainerRef.nativeElement.scrollTop;
+
+    if (this.allMessagesLoaded) {
+      return;
+    }
+
+    if(scrollTop == 0 && !this.isLoadingMessages ) {
+      this.isLoadingMessages = true;
+      this.count += 20;
+      this.userService.getMessage(this.currentId, this.count).subscribe((res) => {
+
+        if (res.length === 0) {
+          this.shouldScrollToBottom = false;
+          this.allMessagesLoaded = true;
+        } else {
+          for (const message of res) {
+            this.addToInbox(message);
+            this.shouldScrollToBottom = true;
+          }
+        }
+        this.isLoadingMessages = false;
+
+
+        if (this.shouldScrollToBottom) {
+          this.chatContainerRef.nativeElement.scrollTop = this.chatContainerRef.nativeElement.scrollHeight;
+        }
+      })
+    }
+  }
+
+  private scrollToBottom(): void {
+    try {
+      this.chatContainerRef.nativeElement.scrollTop = this.chatContainerRef.nativeElement.scrollHeight;
+    } catch (err) { }
+  }
+
 }

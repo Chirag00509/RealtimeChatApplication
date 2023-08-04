@@ -52,7 +52,7 @@ input {
 }
 
 .text {
-  overflow-y: auto;
+  overflow: auto;
   padding-top: 35px;
   height: 450px;
   color: #A6ACAF;

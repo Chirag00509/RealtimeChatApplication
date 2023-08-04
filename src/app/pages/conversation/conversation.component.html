@@ -6,7 +6,7 @@
     <p style="font-weight: 600;"> {{ users }} </p>
   </div>
   <div class="background">
-    <div class="text">
+    <div class="text" #chatContainer scroll-bottom (scroll)="onChatScroll()">
       <span *ngFor="let message of msgInboxArray" class="text1">
         <div class="incoming message" *ngIf="message.senderId == currentId" (click)="showDropdown(message.id)">
           <h4>{{users}}</h4>

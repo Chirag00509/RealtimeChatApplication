@@ -10,8 +10,8 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 export class ChatService {
   token = localStorage.getItem("authToken");
   private connection: any = new signalR.HubConnectionBuilder().withUrl(`https://localhost:7223/chat?token=${this.token}`)
-    .configureLogging(signalR.LogLevel.Information)
-    .build();
+  .configureLogging(signalR.LogLevel.Information)
+  .build();
 
   private msgInboxArray: MessageDto[] = [];
   private sharedObj = new Subject<MessageDto>();;
@@ -20,6 +20,7 @@ export class ChatService {
     this.connection.onclose(async () => {
       await this.start();
     });
+    debugger;
     this.connection.on("ReceiveOne", (message: any) => { this.mapReceivedMessage( message ); });
     this.connection.on("ReceiveEdited", (message: any) => { this.mapReceivedEditedMessage( message ); });
     this.connection.on("ReceiveDeleted", (message: any) => { this.mapReceivedDeletedMessage( message ); });
@@ -69,7 +70,8 @@ export class ChatService {
     }
   }
 
-  public broadcastMessage(msgDto: any) {
+  public broadcastMessage( msgDto: any) {
+    debugger;
     this.connection.invoke("SendMessage", msgDto).catch((err: any) => console.error(err));
   }
 
