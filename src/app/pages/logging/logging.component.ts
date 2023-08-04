@@ -14,7 +14,6 @@ export class LoggingComponent implements OnInit {
   selectedTimeframe: FormControl = new FormControl('Last 5 mins');
   customStartTime: FormControl = new FormControl();
   customEndTime: FormControl = new FormControl();
-
   showId = true;
   showIP = true;
   showUsername = true;
@@ -22,7 +21,7 @@ export class LoggingComponent implements OnInit {
   showTimestamp = true;
 
 
-  constructor(private loggService : LoggService, private formBuilder : FormBuilder) {}
+  constructor( private loggService : LoggService ) {}
 
   ngOnInit(): void {
     this.getLogDetails();
@@ -48,7 +47,10 @@ export class LoggingComponent implements OnInit {
   }
 
   getLogDetails() {
-    this.loggService.getLogs().subscribe((res) => {
+    const startTime = this.customStartTime.value;
+    const endTime = this.customEndTime.value;
+
+    this.loggService.getLogs(startTime, endTime).subscribe((res) => {
       this.allLoggs  = res;
       const selectedValue = this.selectedTimeframe.value;
       this.onTimeframeSelection(selectedValue);
@@ -68,19 +70,5 @@ export class LoggingComponent implements OnInit {
       return false;
     });
 
-  }
-
-  onCustomTimeframeSelected() {
-    const startTime = new Date(this.customStartTime.value).getTime();
-    const endTime = new Date(this.customEndTime.value).getTime();
-
-    if (!isNaN(startTime) && !isNaN(endTime) && startTime <= endTime) {
-      this.loggs = this.allLoggs.filter((log) => {
-        const logTimestamp = new Date(log.timeStamp).getTime();
-        return !isNaN(logTimestamp) && logTimestamp >= startTime && logTimestamp <= endTime;
-      });
-    } else {
-      console.log('Invalid custom time range');
-    }
   }
 }

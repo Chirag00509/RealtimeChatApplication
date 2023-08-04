@@ -9,7 +9,7 @@ export class LoggService {
 
   constructor(private http: HttpClient) { }
 
-  getLogs(): Observable<any> {
+  getLogs(startTime: any, endTime: any): Observable<any> {
 
     const token = localStorage.getItem('authToken');
 
@@ -18,6 +18,10 @@ export class LoggService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.get<any>("https://localhost:7223/api/Log", { headers: headers })
+    if(startTime == null && endTime == null) {
+      return this.http.get<any>("https://localhost:7223/api/Log", { headers: headers })
+    }
+
+    return this.http.get<any>(`https://localhost:7223/api/Log?startTime=${startTime}&endTime=${endTime}`, { headers: headers })
   }
 }
