@@ -23,8 +23,8 @@ export class LoggService {
       'Authorization': `Bearer ${token}`
     });
 
-    if(startTime == null && endTime == null) {
-      return this.http.get<any>("https://localhost:7223/api/Log", { headers: headers })
+    if(endTime == null) {
+      return this.http.get<any>(`https://localhost:7223/api/Log?startTime=${startTime}`, { headers: headers })
     }
     return this.http.get<any>(`https://localhost:7223/api/Log?startTime=${startTime}&endTime=${endTime}`, { headers: headers })
   }

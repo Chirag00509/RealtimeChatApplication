@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { LoggService } from '../../services/logg.service';
 import { AbstractControl, FormControl, FormGroup, FormBuilder } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-logging',
@@ -19,22 +20,26 @@ export class LoggingComponent implements OnInit {
   showUsername = true;
   showRequestBody = true;
   showTimestamp = true;
+  timestemp :any;
 
-
-  constructor( private loggService : LoggService ) {}
+  constructor(private loggService: LoggService, private datePipe: DatePipe) { }
 
   ngOnInit(): void {
+    this.timestemp = 5;
     this.getLogDetails();
     this.selectedTimeframe.valueChanges.subscribe((selectedValue) => {
       this.onTimeframeSelection(selectedValue);
+      if(selectedValue != "Custom") {
+        this.getLogDetails();
+      }
     });
   }
 
   onTimeframeSelection(selectedValue: string) {
-
     if (selectedValue === 'Custom') {
       this.customStartTime.reset();
       this.customEndTime.reset();
+      this.timestemp = "Custom"
     } else {
       let minutes = 5;
       if (selectedValue === 'Last 10 mins') {
@@ -42,40 +47,26 @@ export class LoggingComponent implements OnInit {
       } else if (selectedValue === 'Last 30 mins') {
         minutes = 30;
       }
-      this.filterLogsByTimeframe(minutes);
+      this.timestemp = minutes
     }
   }
 
   getLogDetails() {
-    const startTime = this.customStartTime.value;
     const endTime = this.customEndTime.value;
-
+    console.log(endTime);
+    let startTime: any = null;
+    console.log(this.timestemp);
+    if (this.timestemp === 'Custom') {
+      startTime = this.customStartTime.value;
+      console.log(startTime);
+      this.loggs = [];
+    } else {
+      const currentTime = new Date();
+      const time = new Date(currentTime.getTime() - this.timestemp * 60000);
+      startTime = this.datePipe.transform(time, 'HH:mm');
+    }
     this.loggService.getLogs(startTime, endTime).subscribe((res) => {
-      debugger;
-
-      if(startTime != null && endTime != null ) {
-        this.loggs = res;
-      } else {
-        this.allLoggs  = res;
-      }
-
-      const selectedValue = this.selectedTimeframe.value;
-      this.onTimeframeSelection(selectedValue);
+      this.loggs = res;
     });
-  }
-
-  filterLogsByTimeframe(minutes: number) {
-    const currentTime = new Date();
-    const timeThreshold = currentTime.getTime() - minutes * 60000;
-
-    this.loggs = this.allLoggs.filter((log) => {
-      const logTimestamp = new Date(log.timeStamp).getTime();
-      if (!isNaN(logTimestamp)) {
-        return logTimestamp >= timeThreshold;
-      }
-
-      return false;
-    });
-
   }
 }
