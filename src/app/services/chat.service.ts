@@ -22,8 +22,8 @@ export class ChatService {
     });
     debugger;
     this.connection.on("ReceiveOne", (message: any) => { this.mapReceivedMessage( message ); });
-    // this.connection.on("ReceiveEdited", (message: any) => { this.mapReceivedEditedMessage( message ); });
-    // this.connection.on("ReceiveDeleted", (message: any) => { this.mapReceivedDeletedMessage( message ); });
+    this.connection.on("ReceiveEdited", (message: any) => { this.mapReceivedEditedMessage( message ); });
+    this.connection.on("ReceiveDeleted", (message: any) => { this.mapReceivedDeletedMessage( message ); });
 
     this.start();
   }
@@ -41,7 +41,6 @@ export class ChatService {
   }
 
   private mapReceivedMessage(message:any): void {
-    debugger;
     const receivedMessageObject: MessageDto = {
       id: message.id,
       senderId: message.senderId,
@@ -52,26 +51,26 @@ export class ChatService {
     this.sharedObj.next(receivedMessageObject);
   }
 
-  // public updateMessage(allMessage: any) {
-  //   this.msgInboxArray = allMessage;
-  // }
+  public updateMessage(allMessage: any) {
+    this.msgInboxArray = allMessage;
+  }
 
-  // private mapReceivedEditedMessage(message: any) : void {
-  //   const editedMessageIndex = this.msgInboxArray.findIndex(msg => msg.id == message.id);
-  //   if (editedMessageIndex !== -1) {
-  //     this.msgInboxArray[editedMessageIndex].content = message.content;
-  //   }
-  // }
+  private mapReceivedEditedMessage(message: any) : void {
+    debugger;
+    const editedMessageIndex = this.msgInboxArray.findIndex(msg => msg.id == message.id);
+    if (editedMessageIndex !== -1) {
+      this.msgInboxArray[editedMessageIndex].content = message.content;
+    }
+  }
 
-  // private mapReceivedDeletedMessage(message : any) : void {
-  //   const editedMessageIndex = this.msgInboxArray.findIndex(msg => msg.id == message.id);
-  //   if (editedMessageIndex !== -1) {
-  //     this.msgInboxArray.splice(editedMessageIndex, 1);
-  //   }
-  // }
+  private mapReceivedDeletedMessage(message : any) : void {
+    const editedMessageIndex = this.msgInboxArray.findIndex(msg => msg.id == message.id);
+    if (editedMessageIndex !== -1) {
+      this.msgInboxArray.splice(editedMessageIndex, 1);
+    }
+  }
 
   public broadcastMessage( msgDto: any) {
-    debugger;
     this.connection.invoke("SendMessage", msgDto).catch((err: any) => console.error(err));
   }
 
@@ -80,7 +79,6 @@ export class ChatService {
   }
 
   public broadcastDeletedMessage(msgDto: any) {
-    debugger;
     this.connection.invoke("SendDeletedMessage", msgDto).catch((err: any) => console.error(err));
   }
 
