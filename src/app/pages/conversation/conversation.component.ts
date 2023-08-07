@@ -6,6 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import jwt_decode from 'jwt-decode';
 import { MessageDto } from 'src/app/Dto/MessageDto';
 import { ChatService } from '../../services/chat.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-conversation',
@@ -36,10 +37,13 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
   msgInboxArray: MessageDto[] = [];
   length: number = 0;
   count : number = 20;
+  before: any;
 
-  constructor(private userService: UserService, private formBuilder: FormBuilder, private router: Router, private route: ActivatedRoute, private chatService: ChatService) { }
+  constructor(private userService: UserService, private datePipe: DatePipe, private formBuilder: FormBuilder, private router: Router, private route: ActivatedRoute, private chatService: ChatService) { }
 
   ngOnInit(): void {
+    const currentDate = new Date();
+    this.before = this.datePipe.transform(currentDate, 'dd/MM/yyyy HH:mm');
     this.route.params.subscribe(params => {
       this.currentId = params['id'];
       this.showMessage(this.currentId);
@@ -104,7 +108,7 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
   }
 
   showMessage(id: number) {
-    this.userService.getMessage(id, this.count).subscribe((res) => {
+    this.userService.getMessage(id, this.count, this.before).subscribe((res) => {
     this.shouldScrollToBottom = true;
       this.msgInboxArray = [];
       for (const message of res) {
@@ -214,7 +218,7 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
     if(scrollTop == 0 && !this.isLoadingMessages ) {
       this.isLoadingMessages = true;
       this.count += 20;
-      this.userService.getMessage(this.currentId, this.count).subscribe((res) => {
+      this.userService.getMessage(this.currentId, this.count, this.before).subscribe((res) => {
 
         if (res.length === 0) {
           this.shouldScrollToBottom = false;

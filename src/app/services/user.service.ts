@@ -40,8 +40,7 @@ export class UserService {
     return this.http.get<any[]>("https://localhost:7223/api/User", { headers : headers } );
   }
 
-  getMessage(id: any, count: number) : Observable<any> {
-
+  getMessage(id: any, count: number, before: any) : Observable<any> {
     const token = localStorage.getItem('authToken');
 
     const headers = new HttpHeaders({
@@ -49,7 +48,7 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.get<any[]>(`https://localhost:7223/api/Message/${id}/?count=${count}`, { headers : headers } );
+    return this.http.get<any[]>(`https://localhost:7223/api/Message/${id}/?count=${count}&before=${before}`, { headers : headers } );
   }
 
   sendMesage(data: any, id: any) : Observable<any> {

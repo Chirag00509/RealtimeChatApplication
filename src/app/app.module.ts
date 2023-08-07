@@ -14,6 +14,7 @@ import {
   GoogleLoginProvider
 } from '@abacritt/angularx-social-login';
 import { SearchResultComponent } from './pages/search-result/search-result.component';
+import { DatePipe } from '@angular/common';
 
 
 
@@ -53,7 +54,7 @@ import { SearchResultComponent } from './pages/search-result/search-result.compo
           console.error(err);
         }
       } as SocialAuthServiceConfig,
-    }
+    }, DatePipe
   ],
   bootstrap: [AppComponent]
 })

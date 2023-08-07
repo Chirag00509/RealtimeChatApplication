@@ -51,7 +51,14 @@ export class LoggingComponent implements OnInit {
     const endTime = this.customEndTime.value;
 
     this.loggService.getLogs(startTime, endTime).subscribe((res) => {
-      this.allLoggs  = res;
+      debugger;
+
+      if(startTime != null && endTime != null ) {
+        this.loggs = res;
+      } else {
+        this.allLoggs  = res;
+      }
+
       const selectedValue = this.selectedTimeframe.value;
       this.onTimeframeSelection(selectedValue);
     });

@@ -11,6 +11,11 @@ export class LoggService {
 
   getLogs(startTime: any, endTime: any): Observable<any> {
 
+    console.log(startTime);
+    console.log(endTime);
+
+
+
     const token = localStorage.getItem('authToken');
 
     const headers = new HttpHeaders({
@@ -21,7 +26,6 @@ export class LoggService {
     if(startTime == null && endTime == null) {
       return this.http.get<any>("https://localhost:7223/api/Log", { headers: headers })
     }
-
     return this.http.get<any>(`https://localhost:7223/api/Log?startTime=${startTime}&endTime=${endTime}`, { headers: headers })
   }
 }

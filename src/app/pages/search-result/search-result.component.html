@@ -1,6 +1,16 @@
-<div class="message-container">
-  <div *ngFor="let message of messages" class="message">
-    <h4>{{ senderNames[message.senderId] }}</h4>
-    <p>{{ message.content }}</p>
-  </div>
-</div>
+<table class="message-table">
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Message</th>
+    </tr>
+  </thead>
+  <tbody>
+    <ng-container *ngFor="let message of messages">
+      <tr class="message-row">
+        <td>{{ senderNames[message.senderId] }}</td>
+        <td>{{ message.content }}</td>
+      </tr>
+    </ng-container>
+  </tbody>
+</table>
