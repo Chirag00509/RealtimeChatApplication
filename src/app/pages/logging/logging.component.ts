@@ -53,12 +53,9 @@ export class LoggingComponent implements OnInit {
 
   getLogDetails() {
     const endTime = this.customEndTime.value;
-    console.log(endTime);
     let startTime: any = null;
-    console.log(this.timestemp);
     if (this.timestemp === 'Custom') {
       startTime = this.customStartTime.value;
-      console.log(startTime);
       this.loggs = [];
     } else {
       const currentTime = new Date();
@@ -66,6 +63,8 @@ export class LoggingComponent implements OnInit {
       startTime = this.datePipe.transform(time, 'HH:mm');
     }
     this.loggService.getLogs(startTime, endTime).subscribe((res) => {
+      console.log(res);
+
       this.loggs = res;
     });
   }

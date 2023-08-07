@@ -10,12 +10,6 @@ export class LoggService {
   constructor(private http: HttpClient) { }
 
   getLogs(startTime: any, endTime: any): Observable<any> {
-
-    console.log(startTime);
-    console.log(endTime);
-
-
-
     const token = localStorage.getItem('authToken');
 
     const headers = new HttpHeaders({

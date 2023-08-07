@@ -176,7 +176,7 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
   deleteMessage(id: any) {
     const isConfirmed = confirm("Are you sure you want to delete this message?");
     if (isConfirmed) {
-      this.getMessages(this.msgInboxArray);
+      // this.getMessages(this.msgInboxArray);
       this.userService.deleteMessage(id).subscribe((res) => {
         const editDto = {
           id: id,
@@ -196,7 +196,7 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
     this.displyMessage = message.content;
     this.editMessageId = message.id;
     this.messageEdit = true;
-    this.getMessages(this.msgInboxArray);
+    // this.getMessages(this.msgInboxArray);
   }
 
   showDropdown(messageId: any) {
@@ -204,9 +204,9 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
     this.selectedMessageId = this.selectedMessageId === messageId ? null : messageId;
   }
 
-  getMessages(message: any) {
-    this.chatService.updateMessage(message);
-  }
+  // getMessages(message: any) {
+  //   this.chatService.updateMessage(message);
+  // }
 
   onChatScroll() {
     const scrollTop = this.chatContainerRef.nativeElement.scrollTop;
