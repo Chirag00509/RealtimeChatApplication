@@ -2,14 +2,15 @@ import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { HttpClient } from '@angular/common/http';
 import { MessageDto } from '../Dto/MessageDto';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  token = localStorage.getItem("authToken");
-  private connection: any = new signalR.HubConnectionBuilder().withUrl(`https://localhost:7223/chat?token=${this.token}`)
+  token: any = localStorage.getItem("authToken");
+
+  private connection: any = new signalR.HubConnectionBuilder().withUrl(`https://localhost:7223/chat?token=${this.token}` )
   .configureLogging(signalR.LogLevel.Information)
   .build();
 
@@ -18,10 +19,9 @@ export class ChatService {
 
   constructor(private http: HttpClient) {
     this.connection.onclose(async () => {
-      await this.start();
+      // await this.start();
     });
-    debugger;
-    this.connection.on("ReceiveOne", (message: any) => { this.mapReceivedMessage( message ); });
+    this.connection.on("ReceiveOne", (message: any, senderId: any) => { this.mapReceivedMessage( message, senderId ); });
     this.connection.on("ReceiveEdited", (message: any) => { this.mapReceivedEditedMessage( message ); });
     this.connection.on("ReceiveDeleted", (message: any) => { this.mapReceivedDeletedMessage( message ); });
 
@@ -32,19 +32,17 @@ export class ChatService {
     try {
       await this.connection.start();
       console.log("connected");
-      const connectionId = this.connection.connectionId;
-      console.log("Connection ID:", connectionId);
     } catch (err) {
       console.log(err);
       setTimeout(() => this.start(), 5000);
     }
   }
 
-  private mapReceivedMessage(message:any): void {
+  private mapReceivedMessage(message:any, senderId: any): void {
     const receivedMessageObject: MessageDto = {
       id: message.id,
-      senderId: message.senderId,
-      reciverdId: message.receiverId,
+      senderId: senderId,
+      ReceiverId: message.receiverId,
       content: message.content
     };
 
@@ -56,7 +54,6 @@ export class ChatService {
   }
 
   private mapReceivedEditedMessage(message: any) : void {
-    debugger;
     const editedMessageIndex = this.msgInboxArray.findIndex(msg => msg.id == message.id);
     if (editedMessageIndex !== -1) {
       this.msgInboxArray[editedMessageIndex].content = message.content;

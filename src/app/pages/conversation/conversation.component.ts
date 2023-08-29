@@ -36,7 +36,7 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
   msgDto: MessageDto = new MessageDto();
   msgInboxArray: MessageDto[] = [];
   length: number = 0;
-  count : number = 20;
+  count: number = 20;
   before: any;
 
   constructor(private userService: UserService, private datePipe: DatePipe, private formBuilder: FormBuilder, private router: Router, private route: ActivatedRoute, private chatService: ChatService) { }
@@ -109,13 +109,14 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
 
   showMessage(id: number) {
     this.userService.getMessage(id, this.count, this.before).subscribe((res) => {
-    this.shouldScrollToBottom = true;
+      this.shouldScrollToBottom = true;
       this.msgInboxArray = [];
       for (const message of res) {
         this.addToInbox(message);
       }
+      this.getMessages(this.msgInboxArray);
       this.allMessages = this.msgInboxArray.filter(
-        (message) => message.senderId === this.userId || message.reciverdId === this.userId
+        (message) => message.senderId === this.userId || message.ReceiverId === this.userId
       );
     }, (error) => {
       if (error instanceof HttpErrorResponse) {
@@ -128,11 +129,17 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
   saveMessage(event: any, id: any) {
     event.preventDefault();
     this.userService.editMessage(id, this.displyMessage).subscribe((res) => {
+      console.log(res);
       const editDto = {
         content: this.displyMessage,
         id: id,
+        ReceiverId: res.receiverId,
       };
       this.chatService.broadcastEditedMessage(editDto);
+      const editedMessageIndex = this.msgInboxArray.findIndex(msg => msg.id == res.id);
+      if (editedMessageIndex !== -1) {
+        this.msgInboxArray[editedMessageIndex].content = res.content;
+      }
       alert(res.message);
       this.messageEdit = false
     })
@@ -143,7 +150,7 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
     if (!messageExists) {
       this.msgInboxArray.push(obj);
       this.allMessages = this.msgInboxArray.filter(
-        (message) => message.senderId === this.userId || message.reciverdId === this.userId
+        (message) => message.senderId === this.userId || message.ReceiverId === this.userId
       );
     }
 
@@ -156,11 +163,11 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
   sendMessages(data: any) {
     this.shouldScrollToBottom = true;
     this.userService.sendMesage(data, this.currentId).subscribe(async (res) => {
+      this.addToInbox(res)
       this.msgDto = {
         content: res.content,
-        reciverdId: res.receiverId,
+        ReceiverId: res.receiverId,
         id: res.messageId,
-        senderId: res.senderId
       }
       this.chatService.broadcastMessage(this.msgDto);
       this.showMessageInput = ""
@@ -176,12 +183,16 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
   deleteMessage(id: any) {
     const isConfirmed = confirm("Are you sure you want to delete this message?");
     if (isConfirmed) {
-      this.getMessages(this.msgInboxArray);
       this.userService.deleteMessage(id).subscribe((res) => {
-        const editDto = {
-          id: id,
-        };
-        this.chatService.broadcastDeletedMessage(editDto);
+        // const editDto = {
+        //   id: id,
+        //   ReceiverId: res.receiverId
+        // };
+        // this.chatService.broadcastDeletedMessage(editDto);
+        // const editedMessageIndex = this.msgInboxArray.findIndex(msg => msg.id == res.id);
+        // if (editedMessageIndex !== -1) {
+        //   this.msgInboxArray.splice(editedMessageIndex, 1);
+        // }
         alert(res.message);
       }, (error) => {
         if (error instanceof HttpErrorResponse) {
@@ -215,7 +226,7 @@ export class ConversationComponent implements OnInit, AfterViewInit, AfterViewCh
       return;
     }
 
-    if(scrollTop == 0 && !this.isLoadingMessages ) {
+    if (scrollTop == 0 && !this.isLoadingMessages) {
       this.isLoadingMessages = true;
       this.count += 20;
       this.userService.getMessage(this.currentId, this.count, this.before).subscribe((res) => {

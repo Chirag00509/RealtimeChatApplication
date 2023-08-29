@@ -1,12 +1,12 @@
 export class MessageDto {
   id: number;
-  senderId: string;
-  reciverdId: string;
+  senderId?: string;
+  ReceiverId: string;
   content: string;
 
   constructor() {
     this.senderId = '';
-    this.reciverdId = '';
+    this.ReceiverId = '';
     this.content = '';
     this.id = 0;
   }
